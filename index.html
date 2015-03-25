@@ -10,7 +10,14 @@
 
     <title>Часовня Пасты КПИ</title>
 
-    <script src="http://vk.com/js/api/xd_connection.js?2" type="text/javascript"></script>
+    <script src="//vk.com/js/api/xd_connection.js?2"  type="text/javascript"></script>
+    <script type="text/javascript">
+      function pray() {
+        VK.api("users.get", {}, function(data) {
+            console.log(data);
+        }); 
+      }
+    </script>
   </head>
 
   <body>
@@ -23,7 +30,7 @@
           <h1 id="project_title">Часовня Пасты КПИ</h1>
           <h2 id="project_tagline">Ешь.Моли.КПИ.</h2>
 
-          <a href="#" class="praybutton"/>Помолиться</a>
+          <a href="javascript:alert('Раминь!')" class="praybutton"/>Помолиться</a>
         </header>
     </div>
 
@@ -63,9 +70,10 @@
     
 <script type="text/javascript">
   VK.init(function() {
-     // API initialization succeeded
-     // Your code here
-  });
+    console.log("VK initialized");
+  }, function() {
+     console.log("Failed");
+}, '5.29');
 </script>
   </body>
 </html>
