@@ -12,10 +12,61 @@
 
     <script src="//vk.com/js/api/xd_connection.js?2"  type="text/javascript"></script>
     <script type="text/javascript">
+      test_mode = 0;
+
+      function once_per_day(id, f, f2) {
+        VK.api("storage.get", {"user_id": id, "key": "lastDate",
+                               "global": 0, "test_mode": test_mode},
+          function(data) {
+            data.response = parseInt(data.response);
+            if (isNaN(data.response))
+              data.response = 0;
+            var currentDate = Math.floor(Date.now() / 1000);
+
+            if (currentDate - data.response > 12*60*60) { // once per 12 hours
+              VK.api("storage.set", {"user_id": id, "key": "lastDate",
+                                   "global": 0, "test_mode": test_mode,
+                                   "value": currentDate}
+                  );
+
+              f();
+            } else {
+              f2();
+            }
+          });
+      }
+
+
+      function increase_pray_counter(id) {
+        VK.api("storage.get", {"user_id": id, "key": "prayCount",
+                               "global": 0, "test_mode": test_mode},
+          function(data) {
+            data.response = parseInt(data.response);
+            if (isNaN(data.response))
+              data.response = 0;
+            data.response += 1;
+
+            VK.api("storage.set", {"user_id": id, "key": "prayCount",
+                                   "global": 0, "test_mode": test_mode,
+                                   "value": data.response}
+                  );
+          });
+      }
+
       function pray() {
-        VK.api("users.get", {}, function(data) {
-            console.log(data);
-        }); 
+        VK.api("users.get", {"test_mode": test_mode}, function(data) {
+          var user = data.response[0];
+          console.log(user);
+          once_per_day(user.id,
+              function() {
+                increase_pray_counter(user.id);
+                alert(user.first_name + ", благославляю тебя!");
+              },
+              function() {
+                alert(user.first_name + ", слишком частая мольба не принесет пользы. Пойди и сделай что-то для осуществления своей мольбы!");
+              }
+            );
+        });
       }
     </script>
   </head>
@@ -30,7 +81,7 @@
           <h1 id="project_title">Часовня Пасты КПИ</h1>
           <h2 id="project_tagline">Ешь.Моли.КПИ.</h2>
 
-          <a href="javascript:alert('Раминь!')" class="praybutton"/>Помолиться</a>
+          <a href="javascript:pray()" class="praybutton"/>Помолиться</a>
         </header>
     </div>
 
